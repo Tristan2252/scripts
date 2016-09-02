@@ -1,12 +1,19 @@
 #!/bin/bash
 
 DATE=$(date +%a-%b-%d)
-NODE1_BACKUP=/mnt/Backup-Drive/Backups/Node1
+BACKUP_SERVER="Crimson-Node-1"
+BACKUP=/mnt/Backup-Drive/Backups
 BACKUP_DIRS="/etc /file-pool"
 
-tar czf $NODE1_BACKUP/ARCHIVE/$DATE.tar.gz $NODE1_BACKUP/etc $NODE1_BACKUP/file-pool
 
-for i in $BACKUP_DIRS; do
-    rsync -av $i $NODE1_BACKUP/
-done
+
+if [ $HOSTNAME == $BACKUP_SERVER ]; then
+    tar czf $BACKUP/Node1/ARCHIVE/$DATE.tar.gz $BACKUP/Node1/etc $BACKUP/Node1/file-pool
+
+    for i in $BACKUP_DIRS; do
+        rsync -av $i $BACKUP/Node1/
+    done
+else
+    rsync -avzhe ssh $i server@Node1:$BACKUP/$HOSTNAME/$i
+fi
 
