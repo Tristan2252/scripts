@@ -5,7 +5,7 @@ scripts and mounting scripts.
 
 _______________________________________________________________________________
 
-`backup.sh`:  
+##backup.sh:  
 
 Script that can be placed on a server and configured to backup to a host as well
 as backup the host itself. For example if Node1 is the host of the backup drive,
@@ -22,7 +22,7 @@ tar file titled with the date.
 
 _______________________________________________________________________________
 
-`nfs_mount`:
+##nfs_mount:
 
 This script is used to mount an nfs share or bring up the host if it is down. It
 is a python script that calls bash command based on the status of the nfs host.
