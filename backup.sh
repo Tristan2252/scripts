@@ -15,7 +15,8 @@ if [ $HOSTNAME == $BACKUP_SERVER ]; then
     done
 else
     for i in $BACKUP_DIRS; do
-	    rsync --relative -arvzhe ssh $i server@Node1:$BACKUP/$HOSTNAME/$i
+	ssh server@node1 "mkdir -p $BACKUP/$HOSTNAME$i"
+	rsync -arvzhe ssh --relative $i server@Node1:$BACKUP/$HOSTNAME$i
     done
 fi
 
