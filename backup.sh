@@ -1,13 +1,13 @@
 #!/bin/bash
 
 DATE=$(date +%a-%b-%d)
-BACKUP_SERVER="Crimson-Node-1"
+BACKUP_HOST="Crimson-Node-1"
 BACKUP=/mnt/Backup-Drive/Backups
 BACKUP_DIRS="/etc $@"
 
 
 
-if [ $HOSTNAME == $BACKUP_SERVER ]; then
+if [ $HOSTNAME == $BACKUP_HOST ]; then
     tar czf $BACKUP/Node1/ARCHIVE/$DATE.tar.gz $BACKUP/Node1/etc $BACKUP/Node1/file-pool
 
     for i in $BACKUP_DIRS; do
