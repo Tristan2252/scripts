@@ -1,0 +1,95 @@
+#!/usr/bin/env python3
+
+import os
+import time
+import sys
+
+"""
+Test ping function tests the status of server "hostname" using ping.
+If ping returns 0 status is set to True, if not then false.
+"""
+def check_ping():
+    hostname = "node2"
+    response = os.system("ping -c 1 " + hostname)
+    
+    # and then check the response...
+    if response == 0:
+        print("Host if up: ping successful")
+        pingstatus = True
+    else:
+        print("Host is down: ping unsuccessful")
+        pingstatus = False
+
+    return pingstatus
+
+def check_ifup():
+    status = ""
+    count = 0
+    maxcount = 10
+
+    print("checking interface status")
+    while status.strip(' \t\n\r') != 'up':
+        status = os.popen("cat /sys/class/net/eth2/operstate").read()
+        count = count = 1
+
+        if count == maxcount:
+            print("interface error: unable to bring interface up")
+            return False
+
+    print("interface status: up")
+    return True
+
+def main():
+
+    if not check_ifup():
+        return -1
+    
+    # write stdout to log file
+    sys.stdout = open('/mnt/Backup-Drive/nfs_mount.log', 'w')
+
+    # mount virs
+    mountpoint = "/mnt/Movie-Drive/"
+    mountsrc = "node2:/mnt/Movie-Drive/"
+
+    # count vars for timeout
+    count = 0
+    maxcount = 24
+    
+    # wake Node 2 with etherwake
+    print("running initial ping test to see if node is on...")
+    if not check_ping():
+        print("System Down: init with etherwake")
+        os.system("etherwake -i eth2 00:1b:21:5d:d1:9e")
+
+    # check if prviously mounted
+    elif os.system("mountpoint " + mountpoint) == 0:
+        print("Already Mounted")
+        return
+
+    
+    # run test till success or timeout
+    while True:
+        if check_ping():
+            success = os.system("mount " + mountsrc + " " + mountpoint)
+            if success == 0:
+                print("NFS Mounted at " + mountpoint)
+                break
+            else:
+                print("Mounting error: Unable to mount " + mountsrc)
+                break
+        else:
+            # retry code block to retry mount if failed 
+            print("Server Not Available, Retrying in 10s: Try {} of {}".format(count, maxcount))
+            time.sleep(10)
+            count = count + 1
+
+            # end if failed maxcount times
+            if count == maxcount:
+                print("Error Finding Server: max time reached")
+                break
+   
+    # close log file
+    sys.stdout.close()
+
+if __name__ == "__main__":
+    main()
