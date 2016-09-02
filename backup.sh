@@ -1,22 +1,41 @@
 #!/bin/bash
 
+# Date used for archive tar name
 DATE=$(date +%a-%b-%d)
+
+# Backup host value to test if script needs to use remote commands
 BACKUP_HOST="Crimson-Node-1"
-BACKUP=/mnt/Backup-Drive/Backups
-BACKUP_DIRS="/etc $@"
+
+# Dir to backup to for local and remote 
+BACKUP_DIR=/mnt/Backup-Drive/Backups
+
+# Files to backup
+BACKUP="/etc $@"
 
 
-
+# test for backup host
 if [ $HOSTNAME == $BACKUP_HOST ]; then
-    tar czf $BACKUP/Node1/ARCHIVE/$DATE.tar.gz $BACKUP/Node1/etc $BACKUP/Node1/file-pool
+    
+    # Archive all files in BACKUP_DIR
+    for i in $(ls $BACKUP_DIR); do
 
-    for i in $BACKUP_DIRS; do
-        rsync -av $i $BACKUP/Node1/
+        # remove old archives
+        rm $BACKUP_DIR/ARCHIVE/*
+        tar czf $BACKUP_DIR/ARCHIVE/$i-$DATE.tar.gz $BACKUP_DIR/$i/
     done
+
+    # Backup host with rsync
+    for i in $BACKUP; do
+        rsync -av $i $BACKUP_DIR/$HOSTNAME/
+    done
+
+# if remote host run below code block
 else
-    for i in $BACKUP_DIRS; do
-	ssh server@node1 "mkdir -p $BACKUP/$HOSTNAME$i"
-	rsync -arvzhe ssh --relative $i server@Node1:$BACKUP/$HOSTNAME$i
+    for i in $BACKUP; do
+
+        # make dir if it doesnt exist
+        ssh server@node1 "mkdir -p $BACKUP_DIR/$HOSTNAME$i"
+        rsync -arvzhe ssh --relative $i server@Node1:$BACKUP_DIR/$HOSTNAME$i
     done
 fi
 
