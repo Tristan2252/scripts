@@ -16,12 +16,12 @@ BACKUP="/etc $@"
 # test for backup host
 if [ $HOSTNAME == $BACKUP_HOST ]; then
     
+    # remove old archives
+    rm -v /mnt/Backup-Drive/ARCHIVE/*
+
     # Archive all files in BACKUP_DIR
     for i in $(ls $BACKUP_DIR); do
-
-        # remove old archives
-        rm $BACKUP_DIR/ARCHIVE/*
-        tar czf $BACKUP_DIR/ARCHIVE/$i-$DATE.tar.gz $BACKUP_DIR/$i/
+        tar czf /mnt/Backup-Drive/ARCHIVE/$i-$DATE.tar.gz $BACKUP_DIR/$i/
     done
 
     # Backup host with rsync
