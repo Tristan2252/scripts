@@ -1,0 +1,10 @@
+---
+- hosts: Squid
+  remote_user: root
+  tasks:
+          - name: Install Squid
+            apt: name=squid3 state=present
+          - name: copy config file
+            copy: src=/home/ubuntu/squid.conf dest=/etc/squid/squid.conf owner=root group=root
+          - name: restart Squid
+            service: name=squid state=restarted
