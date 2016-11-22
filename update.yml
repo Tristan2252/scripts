@@ -1,0 +1,46 @@
+---
+- hosts: Servers
+  become: yes
+  become_method: sudo
+  remote_user: ubuntu
+
+  handlers:
+          - name: restart server
+            command: /sbin/reboot
+
+            # Settings to wait for server reboot
+            async: 0
+            poll: 0
+            ignore_errors: true
+
+  tasks:
+          - name: Running Update
+            apt: update_cache=yes
+
+            # Run dist upgrade
+          - name: Running Upgrade
+            apt: upgrade=dist
+            
+            # Check if reboot-required file exists, if it does then reboot
+          - name: Check For Reboot
+            command: /usr/bin/test -f /var/run/reboot-required
+
+            failed_when: False
+            register: restart                   # get error output from command and store in restart var
+            changed_when: "restart.rc == 0"     # if ouput or restart == 0 mark changed flag
+            notify:                             # if changed run notify
+                    - restart server            # if notified, then run restart server handler
+
+- hosts: local
+  become: yes
+  become_method: sudo
+  remote_user: ubuntu
+
+  tasks:
+          - name: Running Update
+            apt: update_cache=yes
+
+            # Run dist upgrade
+          - name: Running Upgrade
+            apt: upgrade=dist
+ 
