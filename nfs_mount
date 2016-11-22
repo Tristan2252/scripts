@@ -29,7 +29,7 @@ def check_ifup():
 
     print("checking interface status")
     while status.strip(' \t\n\r') != 'up':
-        status = os.popen("cat /sys/class/net/eth2/operstate").read()
+        status = os.popen("cat /sys/class/net/enp4s0/operstate").read()
         count = count = 1
 
         if count == maxcount:
