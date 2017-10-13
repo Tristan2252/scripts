@@ -1,0 +1,5 @@
+---
+# file: main.yml
+
+- include: update.yml
+- include: reboot.yml

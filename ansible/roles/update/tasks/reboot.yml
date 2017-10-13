@@ -1,0 +1,10 @@
+---
+# file: reboot.yml
+# copy over reboot.sh to cron.weekly for weekly reboots
+
+- name: Setup Reboot for Servers 
+  copy: src=reboot.sh
+          dest=/etc/cron.weekly/reboot
+          owner=root
+          group=root
+          mode=755

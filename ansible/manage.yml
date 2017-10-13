@@ -6,4 +6,11 @@
   roles:
           - ssh
 
+# anything that needs sudo
+- hosts: Servers
+  become: yes
+  become_method: sudo
+  remote_user: ubuntu
+  roles:
+          - update
 

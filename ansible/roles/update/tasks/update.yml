@@ -1,60 +1,8 @@
 ---
-- hosts: Servers
-  become: yes
-  become_method: sudo
-  remote_user: ubuntu
 
-  handlers:
-          - name: restart server
-            shell: sleep 2 && shutdown -r now
-            become: true
-            async: 1
-            poll: 0
-            ignore_errors: true
+- name: Running Update
+  apt: update_cache=yes
 
-            # run wait_for on local server because remote is rebooting
-            # see: https://github.com/ansible/ansible/issues/14413#issuecomment-256699135
-            #      http://docs.ansible.com/ansible/wait_for_module.html
-          - name: wait for server to come back
-            local_action: wait_for
-            args:
-                host: "{{ ansible_default_ipv4.address }}"
-                port: 22
-                state: started
-                delay: 30
-                timeout: 300
-
-  tasks:
-          - name: Running Update
-            apt: update_cache=yes
-
-            # Run dist upgrade
-          - name: Running Upgrade
-            apt: upgrade=dist
+- name: Running Upgrade
+  apt: upgrade=dist
             
-            # Check if reboot-required file exists, if it does then reboot
-          - name: Check For Reboot
-            shell: "/usr/bin/test -e /var/run/reboot-required; echo $?"
-
-            register: restart                      # get error output from command and store in restart var
-            changed_when: "restart.stdout == '0'"  # if ouput or restart == 0 mark changed flag
-            notify:                                # if changed run notify
-                    - restart server               # if notified, then run restart server handler
-                    - wait for server to come back
-            
-
- ########### RUN UPDATE FOR LOCALHOST ##########
-- hosts: local
-  become: yes
-  become_method: sudo
-  remote_user: ubuntu
-
-  tasks:
-          - name: Running Update
-            apt: update_cache=yes
-
-            # Run dist upgrade
-          - name: Running Upgrade
-            apt: upgrade=dist
- 
-
