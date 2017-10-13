@@ -1,0 +1,13 @@
+---
+# file: sync_ssh.yml
+# ansible script for sysnking ssh keys accross servers
+
+- name: Copy over authorized_keys for ubuntu
+  remote_user: ubuntu
+  copy: src=authorized_keys
+        dest=/home/ubuntu/.ssh/authorized_keys
+        follow=yes
+        owner=ubuntu
+        group=ubuntu
+        mode=0644
+

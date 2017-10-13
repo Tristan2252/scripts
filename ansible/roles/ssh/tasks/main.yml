@@ -1,0 +1,4 @@
+---
+# file: main.yml
+
+- include: copy_keys.yml

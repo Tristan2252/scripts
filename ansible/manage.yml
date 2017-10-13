@@ -1,0 +1,9 @@
+---
+# file: manage.yml
+# Primary file for running ansible
+
+- hosts: Servers
+  roles:
+          - ssh
+
+
